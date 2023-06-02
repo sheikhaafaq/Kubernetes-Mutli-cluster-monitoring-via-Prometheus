@@ -38,9 +38,9 @@
     "annotations": {
       "list": []
     },
-    "description": "https://grafana.com/dashboards/3119 - Monitors Kubernetes cluster using Prometheus. Shows overall cluster CPU / Memory / Filesystem usage as well as individual pod, containers, control plane (as deployed by kops) statistics. Uses cAdvisor metrics only.\r\nTweaked from original https://grafana.com/dashboards/315 to add templating for:\r\n- adaptable $interval (instead of hardcoded 1m)\r\n- selectable $datasource (very useful to have a single dashboard tackling several prometheis )",
+    "description": " Monitors Kubernetes Multiple-cluster using Prometheus. Shows overall cluster CPU / Memory / Filesystem usage as well as individual pod, containers, control plane (as deployed by kops) statistics. Uses cAdvisor metrics only.\r\nTweaked from original https://grafana.com/dashboards/315 to add templating for:\r\n- adaptable $interval (instead of hardcoded 1m)\r\n- selectable $datasource (very useful to have a single dashboard tackling several prometheis )",
     "editable": true,
-    "gnetId": 3119,
+    "gnetId": 31191,
     "graphTooltip": 0,
     "hideControls": false,
     "id": null,
@@ -2296,6 +2296,6 @@
       ]
     },
     "timezone": "browser",
-    "title": "Kubernetes Mutli-cluster monitoring (via Prometheus)",
+    "title": "Kubernetes Mutli-clusters monitoring (via Prometheus)",
     "version": 1
   }
