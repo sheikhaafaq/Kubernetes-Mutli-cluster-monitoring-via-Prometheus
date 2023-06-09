@@ -1,0 +1,218 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 1m
+alerting:
+  alertmanagers:
+  - follow_redirects: true
+    enable_http2: true
+    scheme: http
+    timeout: 10s
+    api_version: v2
+    static_configs:
+    - targets:
+      - localhost:9093
+rule_files:
+- /etc/prometheus/KubeStateAlertsCustomized.yml
+- /etc/prometheus/NodeExporterAlertsCustomized.yml
+scrape_configs:
+- job_name: node-exporter-prod
+  honor_timestamps: true
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  follow_redirects: true
+  enable_http2: true
+  relabel_configs:
+  - source_labels: [__meta_ec2_tag_Name]
+    separator: ;
+    regex: (.*)
+    target_label: instance
+    replacement: $1
+    action: replace
+  - separator: ;
+    regex: __meta_ec2_tag_(.+)
+    replacement: $1
+    action: labelmap
+  ec2_sd_configs:
+  - endpoint: ""
+    region: us-east-1
+    refresh_interval: 1m
+    port: 9100
+    filters:
+    - name: tag:node-exporter
+      values:
+      - "true"
+    - name: tag:environment
+      values:
+      - prod
+    follow_redirects: true
+    enable_http2: true
+- job_name: node-exporter-dev
+  honor_timestamps: true
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  follow_redirects: true
+  enable_http2: true
+  relabel_configs:
+  - source_labels: [__meta_ec2_tag_Name]
+    separator: ;
+    regex: (.*)
+    target_label: instance
+    replacement: $1
+    action: replace
+  - separator: ;
+    regex: __meta_ec2_tag_(.+)
+    replacement: $1
+    action: labelmap
+  ec2_sd_configs:
+  - endpoint: ""
+    region: us-east-1
+    refresh_interval: 1m
+    port: 9100
+    filters:
+    - name: tag:node-exporter
+      values:
+      - "true"
+    - name: tag:environment
+      values:
+      - dev
+    follow_redirects: true
+    enable_http2: true
+- job_name: prometheus-centralised-monitoring-server
+  honor_timestamps: true
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  follow_redirects: true
+  enable_http2: true
+  static_configs:
+  - targets:
+    - localhost:9090
+- job_name: node_exporter-centralised-monitoring-server
+  honor_timestamps: true
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  follow_redirects: true
+  enable_http2: true
+  static_configs:
+  - targets:
+    - localhost:9100
+- job_name: alertmanager-centralised-monitoring-server
+  honor_timestamps: true
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  follow_redirects: true
+  enable_http2: true
+  static_configs:
+  - targets:
+    - localhost:9093
+- job_name: Blackbox-apis
+  honor_timestamps: true
+  params:
+    module:
+    - http_2xx
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /probe
+  scheme: http
+  follow_redirects: true
+  enable_http2: true
+  relabel_configs:
+  - source_labels: [__address__]
+    separator: ;
+    regex: (.*)
+    target_label: __param_target
+    replacement: $1
+    action: replace
+  - source_labels: [__param_target]
+    separator: ;
+    regex: (.*)
+    target_label: instance
+    replacement: $1
+    action: replace
+  - separator: ;
+    regex: (.*)
+    target_label: __address__
+    replacement: localhost:9115
+    action: replace
+  static_configs:
+  - targets:
+    - https://xyx.com
+    - https://abc.com/actuator/health
+- job_name: Monitoring-server
+  honor_timestamps: true
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  follow_redirects: true
+  enable_http2: true
+  relabel_configs:
+  - source_labels: [__meta_ec2_tag_PrometheusEnabled]
+    separator: ;
+    regex: "True"
+    replacement: $1
+    action: keep
+  - source_labels: [__meta_ec2_tag_Name, __meta_ec2_private_ip]
+    separator: ;
+    regex: (.*)
+    target_label: instance
+    replacement: $1
+    action: replace
+  ec2_sd_configs:
+  - endpoint: ""
+    region: us-east-1   #change as per you region
+    refresh_interval: 1m
+    port: 9100
+    filters: []
+    follow_redirects: true
+    enable_http2: true
+  - endpoint: ""
+    region: us-east-1
+    refresh_interval: 1m
+    port: 9323
+    filters: []
+    follow_redirects: true
+    enable_http2: true
+- job_name: federate
+  honor_labels: true
+  honor_timestamps: true
+  params:
+    match[]:
+    - '{job="prometheus"}'
+    - '{job="kubernetes-apiservers"}'
+    - '{job="kubennetes-nodes"}'
+    - '{job="kubernetes-nodes-cadvisor"}'
+    - '{job="kubernetes-service-endpoints"}'
+    - '{job="kubernetes-service-endpoints-slow"}'
+    - '{job="prometheus-pushgateway"}'
+    - '{job="kubernetes-services"}'
+    - '{job="kubernetes-pods"}'
+    - '{job="kubernetes-pods-slow"}'
+    - '{__name__=~"job:.*"}'
+  scrape_interval: 5s
+  scrape_timeout: 5s
+  metrics_path: /federate
+  scheme: https   #Depends on tagget endpoint http or https
+  follow_redirects: true
+  enable_http2: true
+  static_configs:
+  - targets:
+    - prometheus.dev-eks.com
+    labels:
+      cluster: dev-eks-cluster  #linked to Dashboards, Value should be exact name of kubernetes cluster
+      environment: dev   #  linked to alerts DO NOT CHANGE or DO THE RESPECTIVE CHANGE IN ALERTS_FILES
+  - targets:
+    - prometheus.prod-eks.com  
+    labels:
+      cluster: prod-eks-cluster #linked to Dashboards, Value should be exact name of kubernetes cluster
+      environemt: prod   #  linked to alerts DO NOT CHANGE or DO THE RESPECTIVE CHANGE IN ALERTS_FILES
