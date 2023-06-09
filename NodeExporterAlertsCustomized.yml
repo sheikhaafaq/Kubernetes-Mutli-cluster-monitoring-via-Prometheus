@@ -121,7 +121,7 @@ groups:
         summary: Host unusual disk write latency (instance {{ $labels.instance }})
         description: "Disk latency is growing (write operations > 100ms)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-    - alert: Host"{{ if eq .Labels.environment \"prod\" }}High{{ else if eq .Labels.environment \"dev\" }}Medium{{ end }}"CpuLoad
+    - alert: HostHighCpuLoad
       expr: '(sum by (instance) (avg by (mode, instance) (rate(node_cpu_seconds_total{mode!="idle"}[2m]))) > 0.8) * on(instance) group_left (nodename) node_uname_Low{nodename=~".+"}'
       for: 0m
       labels:
@@ -148,7 +148,7 @@ groups:
         summary: Host CPU steal noisy neighbor (instance {{ $labels.instance }})
         description: "CPU steal is > 10%. A noisy neighbor is killing VM performances or a spot instance may be out of credit.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-    - alert: HostCpu"{{ if eq .Labels.environment \"prod\" }}High{{ else if eq .Labels.environment \"dev\" }}Medium{{ end }}"Iowait
+    - alert: HostCpuHighIowait
       expr: '(avg by (instance) (rate(node_cpu_seconds_total{mode="iowait"}[5m])) * 100 > 10) * on(instance) group_left (nodename) node_uname_Low{nodename=~".+"}'
       for: 0m
       labels:
