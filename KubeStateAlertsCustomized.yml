@@ -1,6 +1,6 @@
 groups:
 
-- name: KubestateExporter
+- name: KubestateExporter[Prod/Dev]
 
   rules:
 
