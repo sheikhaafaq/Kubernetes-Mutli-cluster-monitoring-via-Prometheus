@@ -20,7 +20,7 @@ groups:
         severity: "{{ if eq .Labels.environment \"prod\" }}High{{ else if eq .Labels.environment \"dev\" }}Medium{{ end }}"
       annotations:
         summary: Host memory under memory pressure (instance {{ $labels.instance }})
-        description: "The node is under heavy memory pressure. "{{ if eq .Labels.environment \"prod\" }}High{{ else if eq .Labels.environment \"dev\" }}Medium{{ end }}" rate of major page faults\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        description: "The node is under heavy memory pressure. High rate of major page faults\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
     - alert: HostMemoryIsUnderUtilized
       expr: '(100 - (rate(node_memory_MemAvailable_bytes[30m]) / node_memory_MemTotal_bytes * 100) < 20) * on(instance) group_left (nodename) node_uname_Low{nodename=~".+"}'
