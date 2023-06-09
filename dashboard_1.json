@@ -2296,6 +2296,6 @@
       ]
     },
     "timezone": "browser",
-    "title": "Kubernetes Multi-Clusters Workload monitoring (Prometheus AWS EKS)",
+    "title": "Kubernetes Multi-Clusters Infrastructure monitoring (Prometheus AWS EKS)",
     "version": 1
   }
