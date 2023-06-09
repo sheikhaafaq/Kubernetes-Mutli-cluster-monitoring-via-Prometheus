@@ -2971,7 +2971,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Kubernetes EKS Multi Cluster (Prometheus)",
+  "title": "Kubernetes Multi-Clusters Workload monitoring (Prometheus AWS EKS)",
   "uid": "4XuMd2Iiz",
   "version": 1,
   "weekStart": ""
