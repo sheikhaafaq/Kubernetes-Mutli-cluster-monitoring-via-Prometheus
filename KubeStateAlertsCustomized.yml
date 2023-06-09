@@ -224,7 +224,7 @@ groups:
       expr: 'max without (revision) (kube_statefulset_status_current_revision unless kube_statefulset_status_update_revision) * (kube_statefulset_replicas != kube_statefulset_status_replicas_updated)'
       for: 10m
       labels:
-        severity: 
+        severity: "{{ if eq .Labels.environement \"prod\" }}High{{ else if eq .Labels.environement \"dev\" }}Medium{{ end }}"
       annotations:
         summary: Kubernetes StatefulSet update not rolled out (instance {{ $labels.instance }}, cluster {{ $labels.cluster }}, environment {{ $labels.environement }})
         description: "StatefulSet update has not been rolled out.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
